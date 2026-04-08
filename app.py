@@ -6,6 +6,10 @@ app = Flask(__name__)
 
 POSTS_DIR = "posts"
 
+# 🔥 đảm bảo folder tồn tại
+if not os.path.exists(POSTS_DIR):
+    os.makedirs(POSTS_DIR)
+
 def parse_post(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
@@ -27,6 +31,10 @@ def parse_post(filepath):
     return meta, html_content
 
 def get_posts():
+    # 🔥 đảm bảo không crash nếu folder trống
+    if not os.path.exists(POSTS_DIR):
+        return []
+
     files = os.listdir(POSTS_DIR)
     posts = []
 
@@ -58,21 +66,24 @@ def home():
     <body class="bg-gray-50 text-gray-800">
         <div class="max-w-2xl mx-auto py-10 px-4">
             <h1 class="text-3xl font-bold mb-6">Blog của tôi</h1>
-            <div class="space-y-4">
     """
 
-    for p in posts:
-        html += f"""
-        <div class="border-b pb-3">
-            <a href="/post/{p['slug']}" class="text-xl font-semibold text-blue-600 hover:underline">
-                {p['title']}
-            </a>
-            <p class="text-sm text-gray-500">{p['date']}</p>
-        </div>
-        """
+    if not posts:
+        html += "<p>Chưa có bài viết nào.</p>"
+    else:
+        html += "<div class='space-y-4'>"
+        for p in posts:
+            html += f"""
+            <div class="border-b pb-3">
+                <a href="/post/{p['slug']}" class="text-xl font-semibold text-blue-600 hover:underline">
+                    {p['title']}
+                </a>
+                <p class="text-sm text-gray-500">{p['date']}</p>
+            </div>
+            """
+        html += "</div>"
 
     html += """
-            </div>
         </div>
     </body>
     </html>
