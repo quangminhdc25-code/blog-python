@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string
+from flask import Flask import markdown
 import os
 
 app = Flask(__name__)
@@ -34,7 +34,7 @@ def post(slug):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    return f"<pre>{content}</pre>"
+    html_content = markdown.markdown(content) return f"<div style='max-width:700px;margin:auto;font-family:sans-serif'>{html_content}</div>"
 
 # chạy server
 if __name__ == "__main__":
