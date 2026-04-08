@@ -1,16 +1,10 @@
 from flask import Flask
-import markdown
 import os
 
 app = Flask(__name__)
 
-POSTS_DIR = "posts"
-
-if not os.path.exists(POSTS_DIR):
-    os.makedirs(POSTS_DIR)
-
 # ---------- LAYOUT ----------
-def layout(content, title="Blog"):
+def layout(content, title="App"):
     return f"""
     <!DOCTYPE html>
     <html>
@@ -23,7 +17,7 @@ def layout(content, title="Blog"):
             background: #f5f5f7;
         }}
 
-        /* glass effect giống Windows 11 */
+        /* glass effect */
         .glass {{
             backdrop-filter: blur(10px);
             background: rgba(255,255,255,0.7);
@@ -35,11 +29,11 @@ def layout(content, title="Blog"):
         }}
 
         .fade {{
-            animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.25s ease-in-out;
         }}
 
         @keyframes fadeIn {{
-            from {{ opacity: 0; transform: translateY(10px); }}
+            from {{ opacity: 0; transform: translateY(8px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
         </style>
@@ -55,13 +49,22 @@ def layout(content, title="Blog"):
                 <a href="/" class="font-bold text-lg">My App</a>
 
                 <!-- Dự án 1 -->
-                <div class="relative group">
+                <div class="relative group py-2">
                     <div class="menu-item px-3 py-2 cursor-pointer">Dự án 1</div>
 
-                    <!-- submenu -->
-                    <div class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 w-40 fade">
-                        <a href="/project1/info" class="block px-4 py-2 hover:bg-gray-100">Thông tin</a>
-                        <a href="/project1/guide" class="block px-4 py-2 hover:bg-gray-100">Hướng dẫn</a>
+                    <!-- submenu (FIXED) -->
+                    <div class="absolute hidden group-hover:block top-full left-0 w-44 bg-white shadow-lg rounded-lg fade">
+
+                        <a href="/project1/info"
+                           class="block px-4 py-3 hover:bg-gray-100 rounded-t-lg">
+                           Thông tin
+                        </a>
+
+                        <a href="/project1/guide"
+                           class="block px-4 py-3 hover:bg-gray-100 rounded-b-lg">
+                           Hướng dẫn
+                        </a>
+
                     </div>
                 </div>
 
