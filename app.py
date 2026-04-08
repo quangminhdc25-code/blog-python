@@ -1,11 +1,11 @@
-from flask import Flask import markdown
+from flask import Flask
+import markdown
 import os
 
 app = Flask(__name__)
 
 POSTS_DIR = "posts"
 
-# Lấy danh sách bài viết
 def get_posts():
     files = os.listdir(POSTS_DIR)
     posts = []
@@ -14,7 +14,6 @@ def get_posts():
             posts.append(file.replace(".md", ""))
     return posts
 
-# Trang chủ
 @app.route("/")
 def home():
     posts = get_posts()
@@ -24,7 +23,6 @@ def home():
     html += "</ul>"
     return html
 
-# Trang đọc bài
 @app.route("/post/<slug>")
 def post(slug):
     path = os.path.join(POSTS_DIR, slug + ".md")
@@ -34,9 +32,9 @@ def post(slug):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    html_content = markdown.markdown(content) return f"<div style='max-width:700px;margin:auto;font-family:sans-serif'>{html_content}</div>"
+    html_content = markdown.markdown(content)
+    return f"<div style='max-width:700px;margin:auto;font-family:sans-serif'>{html_content}</div>"
 
-# chạy server
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
