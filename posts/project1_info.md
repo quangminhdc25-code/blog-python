@@ -9,6 +9,9 @@
 ## Hình ảnh minh họa
 
 ![Demo](https://picsum.photos/800/400)
+## Hình ảnh minh họa
+
+![Demo](/static/images/anh1.png)
 
 ## Mô tả thêm
 
