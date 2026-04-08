@@ -14,18 +14,12 @@ def layout(content, title="App"):
 
         <style>
         body {{
-            background: #f5f5f7;
+            transition: background 0.3s, color 0.3s;
         }}
 
         /* glass effect */
         .glass {{
             backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.7);
-        }}
-
-        .menu-item:hover {{
-            background: rgba(0,0,0,0.05);
-            border-radius: 8px;
         }}
 
         .fade {{
@@ -40,47 +34,93 @@ def layout(content, title="App"):
 
     </head>
 
-    <body class="text-gray-900">
+    <body class="bg-white text-gray-900">
 
         <!-- NAVBAR -->
-        <div class="glass border-b sticky top-0 z-50">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex gap-6 items-center">
+        <div id="navbar" class="glass border-b sticky top-0 z-50 bg-white/70">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
 
-                <a href="/" class="font-bold text-lg">My App</a>
+                <div class="flex gap-6 items-center">
 
-                <!-- Dự án 1 -->
-                <div class="relative group py-2">
-                    <div class="menu-item px-3 py-2 cursor-pointer">Dự án 1</div>
+                    <a href="/" class="font-bold text-lg">My App</a>
 
-                    <!-- submenu (FIXED) -->
-                    <div class="absolute hidden group-hover:block top-full left-0 w-44 bg-white shadow-lg rounded-lg fade">
+                    <!-- Dự án 1 -->
+                    <div class="relative group py-2">
+                        <div class="px-3 py-2 cursor-pointer hover:bg-gray-200 rounded-lg">
+                            Dự án 1
+                        </div>
 
-                        <a href="/project1/info"
-                           class="block px-4 py-3 hover:bg-gray-100 rounded-t-lg">
-                           Thông tin
-                        </a>
+                        <div class="absolute hidden group-hover:block top-full left-0 w-44 bg-white shadow-lg rounded-lg fade">
 
-                        <a href="/project1/guide"
-                           class="block px-4 py-3 hover:bg-gray-100 rounded-b-lg">
-                           Hướng dẫn
-                        </a>
+                            <a href="/project1/info"
+                               class="block px-4 py-3 hover:bg-gray-100 rounded-t-lg">
+                               Thông tin
+                            </a>
 
+                            <a href="/project1/guide"
+                               class="block px-4 py-3 hover:bg-gray-100 rounded-b-lg">
+                               Hướng dẫn
+                            </a>
+
+                        </div>
                     </div>
+
+                    <a href="/project2" class="px-3 py-2 hover:bg-gray-200 rounded-lg">Dự án 2</a>
+                    <a href="/project3" class="px-3 py-2 hover:bg-gray-200 rounded-lg">Dự án 3</a>
+
                 </div>
 
-                <!-- Dự án 2 -->
-                <a href="/project2" class="menu-item px-3 py-2">Dự án 2</a>
-
-                <!-- Dự án 3 -->
-                <a href="/project3" class="menu-item px-3 py-2">Dự án 3</a>
+                <!-- DARK MODE TOGGLE -->
+                <button onclick="toggleDark()" class="px-3 py-2 rounded-lg border">
+                    🌙
+                </button>
 
             </div>
         </div>
 
         <!-- CONTENT -->
-        <div class="max-w-3xl mx-auto px-4 py-10 fade">
+        <div id="content" class="max-w-3xl mx-auto px-4 py-10 fade">
             {content}
         </div>
+
+        <!-- SCRIPT DARK MODE -->
+        <script>
+        function setDarkMode(enabled) {{
+            const body = document.body;
+            const navbar = document.getElementById("navbar");
+
+            if (enabled) {{
+                body.classList.remove("bg-white", "text-gray-900");
+                body.classList.add("bg-gray-900", "text-gray-100");
+
+                navbar.classList.remove("bg-white/70");
+                navbar.classList.add("bg-gray-800/70");
+
+                localStorage.setItem("theme", "dark");
+            }} else {{
+                body.classList.remove("bg-gray-900", "text-gray-100");
+                body.classList.add("bg-white", "text-gray-900");
+
+                navbar.classList.remove("bg-gray-800/70");
+                navbar.classList.add("bg-white/70");
+
+                localStorage.setItem("theme", "light");
+            }}
+        }}
+
+        function toggleDark() {{
+            const current = localStorage.getItem("theme");
+            setDarkMode(current !== "dark");
+        }}
+
+        // load khi mở trang
+        window.onload = function() {{
+            const saved = localStorage.getItem("theme");
+            if (saved === "dark") {{
+                setDarkMode(true);
+            }}
+        }}
+        </script>
 
     </body>
     </html>
@@ -97,14 +137,13 @@ def home():
     return layout(content, "Trang chủ")
 
 
-# ----- PROJECT 1 -----
 @app.route("/project1/info")
 def project1_info():
     content = """
     <h1 class="text-2xl font-bold mb-4">Dự án 1 - Thông tin</h1>
     <p>Đây là phần giới thiệu dự án.</p>
     """
-    return layout(content, "Dự án 1 - Thông tin")
+    return layout(content)
 
 
 @app.route("/project1/guide")
@@ -113,21 +152,19 @@ def project1_guide():
     <h1 class="text-2xl font-bold mb-4">Dự án 1 - Hướng dẫn</h1>
     <p>Đây là phần hướng dẫn sử dụng.</p>
     """
-    return layout(content, "Dự án 1 - Hướng dẫn")
+    return layout(content)
 
 
-# ----- PROJECT 2 -----
 @app.route("/project2")
 def project2():
     content = "<h1 class='text-2xl font-bold'>Dự án 2</h1>"
-    return layout(content, "Dự án 2")
+    return layout(content)
 
 
-# ----- PROJECT 3 -----
 @app.route("/project3")
 def project3():
     content = "<h1 class='text-2xl font-bold'>Dự án 3</h1>"
-    return layout(content, "Dự án 3")
+    return layout(content)
 
 
 # ---------- RUN ----------
