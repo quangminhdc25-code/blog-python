@@ -1,7 +1,21 @@
 from flask import Flask
 import os
+import markdown
 
 app = Flask(__name__)
+
+# ---------- LOAD MARKDOWN ----------
+def load_markdown(file_name):
+    path = os.path.join("posts", file_name)
+
+    if not os.path.exists(path):
+        return "<p>Không có nội dung</p>"
+
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    return markdown.markdown(content, extensions=["fenced_code"])
+
 
 # ---------- LAYOUT ----------
 def layout(content, title="App"):
@@ -17,7 +31,6 @@ def layout(content, title="App"):
             transition: background 0.3s, color 0.3s;
         }}
 
-        /* glass effect */
         .glass {{
             backdrop-filter: blur(10px);
         }}
@@ -30,8 +43,17 @@ def layout(content, title="App"):
             from {{ opacity: 0; transform: translateY(8px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
-        </style>
 
+        .prose {{
+            line-height: 1.8;
+            font-size: 18px;
+        }}
+
+        .prose img {{
+            border-radius: 10px;
+            margin: 20px 0;
+        }}
+        </style>
     </head>
 
     <body class="bg-white text-gray-900">
@@ -70,7 +92,7 @@ def layout(content, title="App"):
 
                 </div>
 
-                <!-- DARK MODE TOGGLE -->
+                <!-- DARK MODE -->
                 <button onclick="toggleDark()" class="px-3 py-2 rounded-lg border">
                     🌙
                 </button>
@@ -83,7 +105,7 @@ def layout(content, title="App"):
             {content}
         </div>
 
-        <!-- SCRIPT DARK MODE -->
+        <!-- DARK MODE SCRIPT -->
         <script>
         function setDarkMode(enabled) {{
             const body = document.body;
@@ -113,7 +135,6 @@ def layout(content, title="App"):
             setDarkMode(current !== "dark");
         }}
 
-        // load khi mở trang
         window.onload = function() {{
             const saved = localStorage.getItem("theme");
             if (saved === "dark") {{
@@ -126,6 +147,7 @@ def layout(content, title="App"):
     </html>
     """
 
+
 # ---------- ROUTES ----------
 
 @app.route("/")
@@ -134,25 +156,35 @@ def home():
     <h1 class="text-3xl font-bold mb-4">Trang chủ</h1>
     <p>Chọn một dự án từ menu phía trên.</p>
     """
-    return layout(content, "Trang chủ")
+    return layout(content)
 
 
 @app.route("/project1/info")
 def project1_info():
-    content = """
-    <h1 class="text-2xl font-bold mb-4">Dự án 1 - Thông tin</h1>
-    <p>Đây là phần giới thiệu dự án.</p>
+    html_content = load_markdown("project1_info.md")
+
+    content = f"""
+    <h1 class="text-2xl font-bold mb-6">Dự án 1 - Thông tin</h1>
+    <div class="prose max-w-none">
+        {html_content}
+    </div>
     """
-    return layout(content)
+
+    return layout(content, "Dự án 1 - Thông tin")
 
 
 @app.route("/project1/guide")
 def project1_guide():
-    content = """
-    <h1 class="text-2xl font-bold mb-4">Dự án 1 - Hướng dẫn</h1>
-    <p>Đây là phần hướng dẫn sử dụng.</p>
+    html_content = load_markdown("project1_guide.md")
+
+    content = f"""
+    <h1 class="text-2xl font-bold mb-6">Dự án 1 - Hướng dẫn</h1>
+    <div class="prose max-w-none">
+        {html_content}
+    </div>
     """
-    return layout(content)
+
+    return layout(content, "Dự án 1 - Hướng dẫn")
 
 
 @app.route("/project2")
