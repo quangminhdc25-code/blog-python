@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 POSTS_DIR = "posts"
 
+# Lấy danh sách bài viết
 def get_posts():
     files = os.listdir(POSTS_DIR)
     posts = []
@@ -14,18 +15,38 @@ def get_posts():
             posts.append(file.replace(".md", ""))
     return posts
 
+# Trang chủ
 @app.route("/")
 def home():
     posts = get_posts()
-    html = "<h1>Blog của tôi</h1><ul>"
+
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Blog của tôi</title>
+    </head>
+    <body style="font-family:sans-serif; max-width:700px; margin:auto;">
+        <h1>Blog của tôi</h1>
+        <ul>
+    """
+
     for p in posts:
         html += f'<li><a href="/post/{p}">{p}</a></li>'
-    html += "</ul>"
+
+    html += """
+        </ul>
+    </body>
+    </html>
+    """
+
     return html
 
+# Trang đọc bài
 @app.route("/post/<slug>")
 def post(slug):
     path = os.path.join(POSTS_DIR, slug + ".md")
+
     if not os.path.exists(path):
         return "Không tìm thấy bài viết"
 
@@ -33,8 +54,21 @@ def post(slug):
         content = f.read()
 
     html_content = markdown.markdown(content)
-    return f"<div style='max-width:700px;margin:auto;font-family:sans-serif'>{html_content}</div>"
 
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{slug}</title>
+    </head>
+    <body style="font-family:sans-serif; max-width:700px; margin:auto;">
+        <a href="/">← Quay lại</a>
+        {html_content}
+    </body>
+    </html>
+    """
+
+# chạy server
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
