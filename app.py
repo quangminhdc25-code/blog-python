@@ -26,7 +26,7 @@ def parse_post(filepath):
     else:
         body = content
 
-    html_content = markdown.markdown(body)
+    html_content = markdown.markdown(body, extensions=["fenced_code"])
     return meta, html_content
 
 def get_posts():
@@ -46,9 +46,7 @@ def get_posts():
                 "desc": meta.get("description", "")
             })
 
-    # 🔥 sắp xếp mới nhất lên trên
     posts = sorted(posts, key=lambda x: x["date"], reverse=True)
-
     return posts
 
 def layout(content, title="Blog"):
@@ -58,6 +56,61 @@ def layout(content, title="Blog"):
     <head>
         <title>{title}</title>
         <script src="https://cdn.tailwindcss.com"></script>
+
+        <style>
+        .prose {{
+            line-height: 1.8;
+            font-size: 18px;
+        }}
+
+        .prose h1 {{
+            font-size: 32px;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }}
+
+        .prose h2 {{
+            font-size: 26px;
+            margin-top: 28px;
+            margin-bottom: 12px;
+        }}
+
+        .prose p {{
+            margin-bottom: 16px;
+        }}
+
+        .prose ul {{
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }}
+
+        .prose blockquote {{
+            border-left: 4px solid #ddd;
+            padding-left: 16px;
+            color: #555;
+            margin: 20px 0;
+        }}
+
+        .prose code {{
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }}
+
+        .prose pre {{
+            background: #111;
+            color: #eee;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }}
+
+        img {{
+            border-radius: 10px;
+            margin: 20px 0;
+        }}
+        </style>
+
     </head>
     <body class="bg-white text-gray-900">
 
@@ -81,21 +134,18 @@ def layout(content, title="Blog"):
 def home():
     posts = get_posts()
 
-    if not posts:
-        content = "<p>Chưa có bài viết nào.</p>"
-    else:
-        content = ""
+    content = ""
 
-        for p in posts:
-            content += f"""
-            <div class="mb-8">
-                <a href="/post/{p['slug']}" class="text-2xl font-bold hover:underline">
-                    {p['title']}
-                </a>
-                <p class="text-gray-500 text-sm mt-1">{p['date']}</p>
-                <p class="mt-2 text-gray-700">{p['desc']}</p>
-            </div>
-            """
+    for p in posts:
+        content += f"""
+        <div class="mb-10">
+            <a href="/post/{p['slug']}" class="text-2xl font-bold hover:underline">
+                {p['title']}
+            </a>
+            <p class="text-gray-500 text-sm mt-1">{p['date']}</p>
+            <p class="mt-2 text-gray-700">{p['desc']}</p>
+        </div>
+        """
 
     return layout(content, "Trang chủ")
 
@@ -112,9 +162,9 @@ def post(slug):
     <a href="/" class="text-sm text-blue-600 hover:underline">← Quay lại</a>
 
     <h1 class="text-4xl font-bold mt-4 mb-2">{meta.get("title", "")}</h1>
-    <p class="text-gray-500 text-sm mb-6">{meta.get("date", "")}</p>
+    <p class="text-gray-500 text-sm mb-8">{meta.get("date", "")}</p>
 
-    <div class="prose prose-lg max-w-none">
+    <div class="prose max-w-none">
         {html_content}
     </div>
     """
