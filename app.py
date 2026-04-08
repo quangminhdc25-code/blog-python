@@ -53,17 +53,27 @@ def home():
     <html>
     <head>
         <title>Blog của tôi</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body style="font-family:sans-serif; max-width:700px; margin:auto;">
-        <h1>Blog của tôi</h1>
-        <ul>
+    <body class="bg-gray-50 text-gray-800">
+        <div class="max-w-2xl mx-auto py-10 px-4">
+            <h1 class="text-3xl font-bold mb-6">Blog của tôi</h1>
+            <div class="space-y-4">
     """
 
     for p in posts:
-        html += f'<li><a href="/post/{p["slug"]}">{p["title"]}</a> ({p["date"]})</li>'
+        html += f"""
+        <div class="border-b pb-3">
+            <a href="/post/{p['slug']}" class="text-xl font-semibold text-blue-600 hover:underline">
+                {p['title']}
+            </a>
+            <p class="text-sm text-gray-500">{p['date']}</p>
+        </div>
+        """
 
     html += """
-        </ul>
+            </div>
+        </div>
     </body>
     </html>
     """
@@ -84,12 +94,18 @@ def post(slug):
     <html>
     <head>
         <title>{meta.get("title", slug)}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body style="font-family:sans-serif; max-width:700px; margin:auto;">
-        <a href="/">← Quay lại</a>
-        <h1>{meta.get("title", "")}</h1>
-        <p><i>{meta.get("date", "")}</i></p>
-        {html_content}
+    <body class="bg-gray-50 text-gray-800">
+        <div class="max-w-2xl mx-auto py-10 px-4">
+            <a href="/" class="text-sm text-blue-600 hover:underline">← Quay lại</a>
+            <h1 class="text-3xl font-bold mt-4 mb-2">{meta.get("title", "")}</h1>
+            <p class="text-sm text-gray-500 mb-6">{meta.get("date", "")}</p>
+
+            <div class="prose max-w-none">
+                {html_content}
+            </div>
+        </div>
     </body>
     </html>
     """
