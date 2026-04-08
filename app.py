@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 POSTS_DIR = "posts"
 
-# 🔥 đảm bảo folder tồn tại
 if not os.path.exists(POSTS_DIR):
     os.makedirs(POSTS_DIR)
 
@@ -31,10 +30,6 @@ def parse_post(filepath):
     return meta, html_content
 
 def get_posts():
-    # 🔥 đảm bảo không crash nếu folder trống
-    if not os.path.exists(POSTS_DIR):
-        return []
-
     files = os.listdir(POSTS_DIR)
     posts = []
 
@@ -47,49 +42,62 @@ def get_posts():
             posts.append({
                 "slug": slug,
                 "title": meta.get("title", slug),
-                "date": meta.get("date", "")
+                "date": meta.get("date", ""),
+                "desc": meta.get("description", "")
             })
 
+    # 🔥 sắp xếp mới nhất lên trên
+    posts = sorted(posts, key=lambda x: x["date"], reverse=True)
+
     return posts
+
+def layout(content, title="Blog"):
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{title}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-white text-gray-900">
+
+        <!-- NAVBAR -->
+        <div class="border-b">
+            <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between">
+                <a href="/" class="font-semibold text-lg">Blog của tôi</a>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="max-w-2xl mx-auto px-4 py-10">
+            {content}
+        </div>
+
+    </body>
+    </html>
+    """
 
 @app.route("/")
 def home():
     posts = get_posts()
 
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Blog của tôi</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-50 text-gray-800">
-        <div class="max-w-2xl mx-auto py-10 px-4">
-            <h1 class="text-3xl font-bold mb-6">Blog của tôi</h1>
-    """
-
     if not posts:
-        html += "<p>Chưa có bài viết nào.</p>"
+        content = "<p>Chưa có bài viết nào.</p>"
     else:
-        html += "<div class='space-y-4'>"
+        content = ""
+
         for p in posts:
-            html += f"""
-            <div class="border-b pb-3">
-                <a href="/post/{p['slug']}" class="text-xl font-semibold text-blue-600 hover:underline">
+            content += f"""
+            <div class="mb-8">
+                <a href="/post/{p['slug']}" class="text-2xl font-bold hover:underline">
                     {p['title']}
                 </a>
-                <p class="text-sm text-gray-500">{p['date']}</p>
+                <p class="text-gray-500 text-sm mt-1">{p['date']}</p>
+                <p class="mt-2 text-gray-700">{p['desc']}</p>
             </div>
             """
-        html += "</div>"
 
-    html += """
-        </div>
-    </body>
-    </html>
-    """
-
-    return html
+    return layout(content, "Trang chủ")
 
 @app.route("/post/<slug>")
 def post(slug):
@@ -100,26 +108,18 @@ def post(slug):
 
     meta, html_content = parse_post(path)
 
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{meta.get("title", slug)}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-50 text-gray-800">
-        <div class="max-w-2xl mx-auto py-10 px-4">
-            <a href="/" class="text-sm text-blue-600 hover:underline">← Quay lại</a>
-            <h1 class="text-3xl font-bold mt-4 mb-2">{meta.get("title", "")}</h1>
-            <p class="text-sm text-gray-500 mb-6">{meta.get("date", "")}</p>
+    content = f"""
+    <a href="/" class="text-sm text-blue-600 hover:underline">← Quay lại</a>
 
-            <div class="prose max-w-none">
-                {html_content}
-            </div>
-        </div>
-    </body>
-    </html>
+    <h1 class="text-4xl font-bold mt-4 mb-2">{meta.get("title", "")}</h1>
+    <p class="text-gray-500 text-sm mb-6">{meta.get("date", "")}</p>
+
+    <div class="prose prose-lg max-w-none">
+        {html_content}
+    </div>
     """
+
+    return layout(content, meta.get("title", slug))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
